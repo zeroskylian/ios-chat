@@ -87,6 +87,6 @@
 }
 
 - (NSString *)digest:(WFCCMessage *)message {
-    return @"[声音]";
+    return @"[语音]";
 }
 @end
