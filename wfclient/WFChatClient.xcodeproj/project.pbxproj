@@ -135,7 +135,7 @@
 		2F8742DE219C4FED00F65EBA /* WFCCChatroomMemberInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F8742D8219C4FED00F65EBA /* WFCCChatroomMemberInfo.m */; };
 		2F8742DF219C4FED00F65EBA /* WFCCChatroomMemberInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F8742D9219C4FED00F65EBA /* WFCCChatroomMemberInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2F8742E0219C4FED00F65EBA /* WFCCChatroomInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F8742DA219C4FED00F65EBA /* WFCCChatroomInfo.m */; };
-		2F8CA19B274641E0000CC09C /* WFCCMarkUnreadMessageContent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F8CA199274641E0000CC09C /* WFCCMarkUnreadMessageContent.h */; };
+		2F8CA19B274641E0000CC09C /* WFCCMarkUnreadMessageContent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F8CA199274641E0000CC09C /* WFCCMarkUnreadMessageContent.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2F8CA19C274641E0000CC09C /* WFCCMarkUnreadMessageContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F8CA19A274641E0000CC09C /* WFCCMarkUnreadMessageContent.m */; };
 		2F9106E3273B4E1400B764DD /* WFAVEngineKit_Import.h in Headers */ = {isa = PBXBuildFile; fileRef = 2F9106E2273B4E1400B764DD /* WFAVEngineKit_Import.h */; };
 		2FB87A622650BDE000790A26 /* WFCCFriend.h in Headers */ = {isa = PBXBuildFile; fileRef = 2FB87A602650BDE000790A26 /* WFCCFriend.h */; settings = {ATTRIBUTES = (Public, ); }; };

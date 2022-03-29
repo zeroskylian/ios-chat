@@ -22,6 +22,7 @@
 #import "WFCCPCOnlineInfo.h"
 #import "WFCCFileRecord.h"
 #import "WFCCFriend.h"
+#import "WFCCNetworkService.h"
 
 #pragma mark - 频道通知定义
 //发送消息状态通知
