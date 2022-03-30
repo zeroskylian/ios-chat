@@ -3,5 +3,8 @@ wfuikit/bin
 wfuikit/bin_tmp
 wfuikit/Frameworks
 wfuikit/WFChatUIKit.xcodeproj/xcuserdata
+wfuikit/build
 wfclient/libcrypto.a
 wfclient/libssl.a
+wfclient/build
+Libs&Resources
