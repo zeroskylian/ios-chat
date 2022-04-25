@@ -1565,12 +1565,12 @@
 		2F551037217F5CC100F56C26 /* ForwardMessage */ = {
 			isa = PBXGroup;
 			children = (
-				2F551038217F5CC100F56C26 /* WFCUForwardViewController.m */,
-				2F551039217F5CC100F56C26 /* WFCUForwardMessageCell.m */,
-				2F55103A217F5CC100F56C26 /* WFCUShareMessageView.m */,
-				2F55103B217F5CC100F56C26 /* WFCUForwardViewController.h */,
-				2F55103D217F5CC100F56C26 /* WFCUShareMessageView.h */,
 				2F55103E217F5CC100F56C26 /* WFCUForwardMessageCell.h */,
+				2F551039217F5CC100F56C26 /* WFCUForwardMessageCell.m */,
+				2F55103B217F5CC100F56C26 /* WFCUForwardViewController.h */,
+				2F551038217F5CC100F56C26 /* WFCUForwardViewController.m */,
+				2F55103D217F5CC100F56C26 /* WFCUShareMessageView.h */,
+				2F55103A217F5CC100F56C26 /* WFCUShareMessageView.m */,
 			);
 			path = ForwardMessage;
 			sourceTree = "<group>";
