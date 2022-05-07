@@ -74,7 +74,6 @@
 #import "WFCUCompositeMessageViewController.h"
 
 #import "WFCUFavoriteItem.h"
-#import "WFCUUploadBigFilesViewController.h"
 
 #import "WFCUUtilities.h"
 
@@ -278,6 +277,10 @@
                 [ws.navigationController popViewControllerAnimated:YES];
             };
         }];
+    }
+    if(self.conversation.type == Channel_Type) {
+        WFCCEnterChannelChatMessageContent *enterContent = [[WFCCEnterChannelChatMessageContent alloc] init];
+        [[WFCCIMService sharedWFCIMService] send:self.conversation content:enterContent success:nil error:nil];
     }
     
     WFCCConversationInfo *info = [[WFCCIMService sharedWFCIMService] getConversationInfo:self.conversation];
@@ -547,6 +550,10 @@
 - (void)leftMessageVC {
     if (self.conversation.type == Chatroom_Type) {
         [self sendChatroomLeaveMessage];
+    }
+    if(self.conversation.type == Channel_Type) {
+        WFCCLeaveChannelChatMessageContent *leaveContent = [[WFCCLeaveChannelChatMessageContent alloc] init];
+        [[WFCCIMService sharedWFCIMService] send:self.conversation content:leaveContent success:nil error:nil];
     }
     
     if(self.conversation.type == Single_Type || self.conversation.type == Group_Type || self.conversation.type == SecretChat_Type) {
@@ -2593,43 +2600,10 @@
         }
     }
     
-    NSMutableArray<WFCCFileMessageContent *> *bigFileContents = [[NSMutableArray alloc] init];
     for (NSString *file in files) {
         WFCCFileMessageContent *content = [WFCCFileMessageContent fileMessageContentFromPath:file];
-        if(content.size >= 80 * 1024 * 1024) {
-            [bigFileContents addObject:content];
-        } else {
-            [self sendMessage:content];
-            [NSThread sleepForTimeInterval:0.05];
-        }
-    }
-    
-    if(bigFileContents.count) {
-        NSString *alertMsg;
-        if(bigFileContents.count == 1) {
-            alertMsg = [NSString stringWithFormat:@"文件 %@ 内容超大，无法直接发送，是否先上传到再发送？", bigFileContents[0].name];
-        } else {
-            alertMsg = [NSString stringWithFormat:@"文件 %@... 内容超大，无法直接发送，是否先上传到再发送？", bigFileContents[0].name];
-        }
-        
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Warning" message:alertMsg preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction *actionCancel = [UIAlertAction actionWithTitle:WFCString(@"Cancel") style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-            
-        }];
-        
-        __weak typeof(self)ws = self;
-        UIAlertAction *actionOk = [UIAlertAction actionWithTitle:WFCString(@"Ok") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-            WFCUUploadBigFilesViewController *vc = [[WFCUUploadBigFilesViewController alloc] init];
-            vc.bigFileContents = bigFileContents;
-            vc.conversation = ws.conversation;
-            [ws.navigationController pushViewController:vc animated:YES];
-        }];
-        
-        [alertController addAction:actionCancel];
-        [alertController addAction:actionOk];
-        
-        [self presentViewController:alertController animated:YES completion:nil];
+        [self sendMessage:content];
+        [NSThread sleepForTimeInterval:0.05];
     }
 }
 
@@ -2805,7 +2779,7 @@
         }
     }
     
-    if(self.conversation.type == SecretChat_Type) {
+    if(self.conversation.type == SecretChat_Type && msg.direction == MessageDirection_Send) {
         canRecall = YES;
     }
     
