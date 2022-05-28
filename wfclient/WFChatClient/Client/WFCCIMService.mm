@@ -425,6 +425,7 @@ public:
 };
 
 extern NSMutableArray* convertProtoMessageList(const std::list<mars::stn::TMessage> &messageList, BOOL reverse);
+extern WFCCGroupInfo *convertProtoGroupInfo(const mars::stn::TGroupInfo &tgi);
 
 class IMLoadRemoteMessagesCallback : public mars::stn::LoadRemoteMessagesCallback {
 private:
@@ -590,24 +591,8 @@ public:
         if (m_successBlock) {
             NSMutableArray *ret = [[NSMutableArray alloc] init];
             for (std::list<const mars::stn::TGroupInfo>::const_iterator it = groupInfoList.begin(); it != groupInfoList.end(); it++) {
-                WFCCGroupInfo *gi = [[WFCCGroupInfo alloc] init];
                 const mars::stn::TGroupInfo &tgi = *it;
-                gi.target = [NSString stringWithUTF8String:tgi.target.c_str()];
-                gi.type = (WFCCGroupType)tgi.type;
-                gi.memberCount = tgi.memberCount;
-                gi.portrait = [NSString stringWithUTF8String:tgi.portrait.c_str()];
-                gi.name = [NSString stringWithUTF8String:tgi.name.c_str()];
-                gi.owner = [NSString stringWithUTF8String:tgi.owner.c_str()];
-                gi.extra = [NSString stringWithUTF8String:tgi.extra.c_str()];
-
-                gi.mute = tgi.mute;
-                gi.joinType = tgi.joinType;
-                gi.privateChat = tgi.privateChat;
-                gi.searchable = tgi.searchable;
-                gi.historyMessage = tgi.historyMessage;
-                gi.maxMemberCount = tgi.maxMemberCount;
-                gi.updateTimestamp = tgi.updateDt;
-                
+                WFCCGroupInfo *gi = convertProtoGroupInfo(tgi);
                 [ret addObject:gi];
             }
             
@@ -763,6 +748,40 @@ public:
     m_successBlock = nil;
     m_errorBlock = nil;
   }
+};
+
+class IMSetGroupRemarkCallback : public mars::stn::GeneralOperationCallback {
+private:
+    NSString *mGroupId;
+    void(^m_successBlock)();
+    void(^m_errorBlock)(int error_code);
+public:
+    IMSetGroupRemarkCallback(NSString *groupId, void(^successBlock)(), void(^errorBlock)(int error_code)) : mars::stn::GeneralOperationCallback(), mGroupId(groupId), m_successBlock(successBlock), m_errorBlock(errorBlock) {};
+    void onSuccess() {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (m_successBlock) {
+                m_successBlock();
+            }
+            WFCCGroupInfo *groupInfo = [[WFCCIMService sharedWFCIMService] getGroupInfo:mGroupId refresh:NO];
+            if(groupInfo.target.length) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:kGroupInfoUpdated object:mGroupId userInfo:@{@"groupInfo":groupInfo}];
+            }
+            delete this;
+        });
+    }
+    void onFalure(int errorCode) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (m_errorBlock) {
+                m_errorBlock(errorCode);
+            }
+            delete this;
+        });
+    }
+
+    virtual ~IMSetGroupRemarkCallback() {
+        m_successBlock = nil;
+        m_errorBlock = nil;
+    }
 };
 
 static WFCCMessage *convertProtoMessage(const mars::stn::TMessage *tMessage) {
@@ -1499,6 +1518,9 @@ static void fillTMessage(mars::stn::TMessage &tmsg, WFCCConversation *conv, WFCC
 - (void)clearMessages:(WFCCConversation *)conversation before:(int64_t)before {
     mars::stn::MessageDB::Instance()->ClearMessages((int)conversation.type, conversation.target.length ? [conversation.target UTF8String] : "", conversation.line, before);
 }
+- (void)clearAllMessages:(BOOL)removeConversation {
+    mars::stn::MessageDB::Instance()->ClearAllMessages(removeConversation);
+}
 - (void)setConversation:(WFCCConversation *)conversation top:(BOOL)top
                 success:(void(^)(void))successBlock
                   error:(void(^)(int error_code))errorBlock {
@@ -1735,6 +1757,7 @@ WFCCGroupInfo *convertProtoGroupInfo(const mars::stn::TGroupInfo &tgi) {
     groupInfo.extra = [NSString stringWithUTF8String:tgi.extra.c_str()];;
     groupInfo.portrait = [NSString stringWithUTF8String:tgi.portrait.c_str()];
     groupInfo.owner = [NSString stringWithUTF8String:tgi.owner.c_str()];
+    groupInfo.remark = [NSString stringWithUTF8String:tgi.remark.c_str()];
     groupInfo.memberCount = tgi.memberCount;
     groupInfo.mute = tgi.mute;
     groupInfo.joinType = tgi.joinType;
@@ -2795,6 +2818,17 @@ public:
     }
     
     mars::stn::MuteOrAllowGroupMember([groupId UTF8String], memberList, isSet, true, lines, tcontent, new IMGeneralOperationCallback(successBlock, errorBlock));
+}
+
+- (NSString *)getGroupRemark:(NSString *)groupId {
+    return [NSString stringWithUTF8String:mars::stn::getGroupRemark([groupId UTF8String]).c_str()];
+}
+
+- (void)setGroup:(NSString *)groupId
+          remark:(NSString *)remark
+         success:(void(^)(void))successBlock
+           error:(void(^)(int error_code))errorBlock {
+    mars::stn::setGroupRemark([groupId UTF8String], remark.length?[remark UTF8String]:"", new IMSetGroupRemarkCallback(groupId, successBlock, errorBlock));
 }
 
 - (NSArray<NSString *> *)getFavGroups {
