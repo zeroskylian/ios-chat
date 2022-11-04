@@ -28,4 +28,7 @@
  */
 @property (nonatomic, strong)NSArray<NSString *> *invitees;
 
+/// 额外字段
+@property (nonatomic, strong) id ex;
+
 @end

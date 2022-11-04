@@ -50,4 +50,6 @@
  */
 @property (nonatomic, strong)NSString *thumbParameter;
 
+-(void)setImageSize:(CGSize)size;
+
 @end

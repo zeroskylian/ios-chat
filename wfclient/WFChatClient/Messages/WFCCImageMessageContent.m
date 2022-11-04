@@ -127,4 +127,8 @@
 - (NSString *)digest:(WFCCMessage *)message {
     return @"[图片]";
 }
+
+-(void)setImageSize:(CGSize)size {
+    self.size = size;
+}
 @end
