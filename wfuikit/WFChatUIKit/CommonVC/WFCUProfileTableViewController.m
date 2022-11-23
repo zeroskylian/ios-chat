@@ -235,7 +235,7 @@
     self.cells = [[NSMutableArray alloc] init];
     
     self.headerCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
-    for (UIView *subView in self.headerCell.subviews) {
+    for (UIView *subView in self.headerCell.contentView.subviews) {
         [subView removeFromSuperview];
     }
     CGFloat width = [UIScreen mainScreen].bounds.size.width;
@@ -342,10 +342,6 @@
                 self.momentCell.selectionStyle = UITableViewCellSelectionStyleNone;
                 self.momentCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
             }
-            
-            self.moreCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"more_cell"];
-            self.moreCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            self.moreCell.textLabel.text = WFCString(@"More");
         }
         
         if ([[WFCCIMService sharedWFCIMService] isMyFriend:self.userId]) {
@@ -416,6 +412,15 @@
     } else {
         [self.sendMessageCell addSubview:btn];
     }
+}
+
+- (UITableViewCell *)moreCell {
+    if(!_moreCell) {
+        _moreCell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"more_cell"];
+        _moreCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        _moreCell.textLabel.text = WFCString(@"More");
+    }
+    return _moreCell;
 }
 
 - (UIEdgeInsets)hiddenSeparatorLine:(UITableViewCell *)cell {
