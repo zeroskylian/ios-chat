@@ -77,12 +77,19 @@
         self.messageUid = [dictData[@"messageUid"] longLongValue];
         self.userId = dictData[@"userId"];
         self.userDisplayName = dictData[@"userDisplayName"];
-        self.messageDigest = dictData[@"messageDigest"];
+        id messageDigest = dictData[@"messageDigest"];
+        if([messageDigest isKindOfClass:NSString.class]) {
+            self.messageDigest = messageDigest;
+        }
     } else {
         self.messageUid = [dictData[@"u"] longLongValue];
         self.userId = dictData[@"i"];
         self.userDisplayName = dictData[@"n"];
-        self.messageDigest = dictData[@"d"];
+//        self.messageDigest = dictData[@"d"];
+        id messageDigest = dictData[@"messageDigest"];
+        if([messageDigest isKindOfClass:NSString.class]) {
+            self.messageDigest = messageDigest;
+        }
     }
 }
 
