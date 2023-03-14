@@ -59,13 +59,36 @@ static WFCUConferenceManager *sharedSingleton = nil;
 - (void)muteAudio:(BOOL)mute {
     if(mute) {
         if(![WFAVEngineKit sharedEngineKit].currentSession.isAudience && [WFAVEngineKit sharedEngineKit].currentSession.isVideoMuted && ![[WFAVEngineKit sharedEngineKit].currentSession isBroadcasting]) {
-            [[WFAVEngineKit sharedEngineKit].currentSession switchAudience:YES];
+            if(![[WFAVEngineKit sharedEngineKit].currentSession switchAudience:YES]) {
+                NSLog(@"switch to audience failure");
+                return;
+            }
         }
         [[WFAVEngineKit sharedEngineKit].currentSession muteAudio:mute];
     } else {
+        if([WFAVEngineKit sharedEngineKit].currentSession.isAudience && ![[WFAVEngineKit sharedEngineKit].currentSession canSwitchAudience]) {
+            NSLog(@"can not switch to participater");
+            return;
+        }
+        
+        if([WFAVEngineKit sharedEngineKit].currentSession.isAudience && self.currentConferenceInfo.maxParticipants > 0) {
+            __block int participantCount = 0;
+            [[WFAVEngineKit sharedEngineKit].currentSession.participants enumerateObjectsUsingBlock:^(WFAVParticipantProfile * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if(!obj.audience) {
+                    participantCount++;
+                }
+            }];
+            if(participantCount >= self.currentConferenceInfo.maxParticipants) {
+                if([self.delegate respondsToSelector:@selector(showToast:)]) {
+                    [self.delegate showToast:@"发言人数已满，无法切换到发言人!"];
+                }
+                return;
+            }
+        }
         [[WFAVEngineKit sharedEngineKit].currentSession muteAudio:mute];
         
         if([WFAVEngineKit sharedEngineKit].currentSession.isAudience) {
+            [[WFAVEngineKit sharedEngineKit].currentSession muteVideo:YES];
             [[WFAVEngineKit sharedEngineKit].currentSession switchAudience:NO];
         }
     }
@@ -79,9 +102,24 @@ static WFCUConferenceManager *sharedSingleton = nil;
         }
         [[WFAVEngineKit sharedEngineKit].currentSession muteVideo:mute];
     } else {
+        if([WFAVEngineKit sharedEngineKit].currentSession.isAudience && self.currentConferenceInfo.maxParticipants > 0) {
+            __block int participantCount = 0;
+            [[WFAVEngineKit sharedEngineKit].currentSession.participants enumerateObjectsUsingBlock:^(WFAVParticipantProfile * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if(!obj.audience) {
+                    participantCount++;
+                }
+            }];
+            if(participantCount >= self.currentConferenceInfo.maxParticipants) {
+                if([self.delegate respondsToSelector:@selector(showToast:)]) {
+                    [self.delegate showToast:@"发言人数已满，无法切换到发言人!"];
+                }
+                return;
+            }
+        }
         [[WFAVEngineKit sharedEngineKit].currentSession muteVideo:mute];
         
         if([WFAVEngineKit sharedEngineKit].currentSession.isAudience) {
+            [[WFAVEngineKit sharedEngineKit].currentSession muteAudio:YES];
             [[WFAVEngineKit sharedEngineKit].currentSession switchAudience:NO];
         }
     }
