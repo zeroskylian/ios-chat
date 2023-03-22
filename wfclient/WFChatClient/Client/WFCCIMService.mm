@@ -1034,7 +1034,7 @@ static void fillTMessage(mars::stn::TMessage &tmsg, WFCCConversation *conv, WFCC
        expireDuration:(int)expireDuration
               success:(void(^)(long long messageUid, long long timestamp))successBlock
                 error:(void(^)(int error_code))errorBlock {
-    return [self sendMedia:conversation content:content expireDuration:0 success:successBlock progress:nil error:errorBlock];
+    return [self sendMedia:conversation content:content expireDuration:expireDuration success:successBlock progress:nil error:errorBlock];
 }
 
 - (WFCCMessage *)send:(WFCCConversation *)conversation
@@ -1043,7 +1043,7 @@ static void fillTMessage(mars::stn::TMessage &tmsg, WFCCConversation *conv, WFCC
        expireDuration:(int)expireDuration
               success:(void(^)(long long messageUid, long long timestamp))successBlock
                 error:(void(^)(int error_code))errorBlock {
-    return [self sendMedia:conversation content:content toUsers:toUsers expireDuration:0 success:successBlock progress:nil error:errorBlock];
+    return [self sendMedia:conversation content:content toUsers:toUsers expireDuration:expireDuration success:successBlock progress:nil error:errorBlock];
 }
 - (WFCCMessage *)sendMedia:(WFCCConversation *)conversation
                    content:(WFCCMessageContent *)content
@@ -2357,6 +2357,10 @@ WFCCGroupInfo *convertProtoGroupInfo(const mars::stn::TGroupInfo &tgi) {
 }
 
 - (NSArray<WFCCConversationSearchInfo *> *)searchConversation:(NSString *)keyword inConversation:(NSArray<NSNumber *> *)conversationTypes lines:(NSArray<NSNumber *> *)lines {
+    return [self searchConversation:keyword inConversation:conversationTypes lines:lines startTime:0 endTime:0 desc:YES limit:50 offset:0];
+}
+
+- (NSArray<WFCCConversationSearchInfo *> *)searchConversation:(NSString *)keyword inConversation:(NSArray<NSNumber *> *)conversationTypes lines:(NSArray<NSNumber *> *)lines startTime:(int64_t)startTime endTime:(int64_t)endTime desc:(BOOL)desc limit:(int)limit offset:(int)offset {
     if (keyword.length == 0) {
         return nil;
     }
@@ -2375,7 +2379,7 @@ WFCCGroupInfo *convertProtoGroupInfo(const mars::stn::TGroupInfo &tgi) {
         ls.insert(ls.end(), 0);
     }
     
-    std::list<mars::stn::TConversationSearchresult> tresult = mars::stn::MessageDB::Instance()->SearchConversations(types, ls, [keyword UTF8String], 50);
+    std::list<mars::stn::TConversationSearchresult> tresult = mars::stn::MessageDB::Instance()->SearchConversationsEx(types, ls, [keyword UTF8String], startTime, endTime, desc?YES:NO, limit, offset);
     NSMutableArray *results = [[NSMutableArray alloc] init];
     for (std::list<mars::stn::TConversationSearchresult>::iterator it = tresult.begin(); it != tresult.end(); it++) {
         WFCCConversationSearchInfo *info = [[WFCCConversationSearchInfo alloc] init];
