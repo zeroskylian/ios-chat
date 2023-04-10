@@ -16,7 +16,10 @@
 - (WFCCMessagePayload *)encode {
     WFCCMediaMessagePayload *payload = (WFCCMediaMessagePayload *)[super encode];
     payload.content = self.title;
-
+    if(self.mentionedType > 0) {
+        payload.mentionedType = self.mentionedType;
+        payload.mentionedTargets = self.mentionedTargets;
+    }
     NSMutableDictionary *dataDict = [NSMutableDictionary dictionary];
     NSMutableArray *arrays = [[NSMutableArray alloc] init];
     int size = 0;
@@ -135,6 +138,10 @@
     [super decode:payload];
     self.title = payload.content;
     self.loaded = YES;
+    if(payload.mentionedType > 0) {
+        self.mentionedType = payload.mentionedType;
+        self.mentionedTargets = payload.mentionedTargets;
+    }
     if ([payload isKindOfClass:WFCCMediaMessagePayload.class]) {
         WFCCMediaMessagePayload *mediaPayload = (WFCCMediaMessagePayload *)payload;
         if (mediaPayload.localMediaPath.length) {
