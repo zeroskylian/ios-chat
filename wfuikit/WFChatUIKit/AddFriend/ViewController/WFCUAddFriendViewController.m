@@ -14,12 +14,17 @@
 #import "WFCUConfigManager.h"
 #import "UIImage+ERCategory.h"
 #import "WFCUImage.h"
+#import "WFCUGeneralImageTextTableViewCell.h"
 
-@interface WFCUAddFriendViewController () <UITableViewDataSource, UISearchControllerDelegate, UISearchResultsUpdating, UITableViewDelegate>
+#define CELL_HEIGHT 56
+
+@interface WFCUAddFriendViewController () <UITableViewDataSource, UISearchControllerDelegate, UISearchResultsUpdating, UITableViewDelegate, UISearchBarDelegate>
 @property (nonatomic, strong)  UITableView              *tableView;
 @property (nonatomic, strong)  UISearchController       *searchController;
 @property (nonatomic, strong) NSArray            *searchList;
-@property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, assign) BOOL texting;
+
+@property (nonatomic, strong) UITextView       *noUserView;
 @end
 
 @implementation WFCUAddFriendViewController
@@ -59,6 +64,7 @@
     }
     
     self.searchController.searchBar.placeholder = WFCString(@"SearchUserHint");
+    self.searchController.searchBar.delegate = self;
     
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     [self.view addSubview:self.tableView];
@@ -79,6 +85,13 @@
     
     self.definesPresentationContext = YES;
     [self.view addSubview:_tableView];
+    
+    self.noUserView = [[UITextView alloc] initWithFrame:CGRectMake(0, 200, self.view.bounds.size.width, 400)];
+    self.noUserView.textAlignment = NSTextAlignmentCenter;
+    self.noUserView.text = @"用户不存在";
+    self.noUserView.font = [UIFont systemFontOfSize:18];
+    self.noUserView.hidden = YES;
+    [self.view addSubview:self.noUserView];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -86,11 +99,46 @@
     self.tabBarController.tabBar.hidden = YES;
 }
 
-#pragma mark - UITableViewDataSource
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.searchController.active = YES;
+    [self.searchController.searchBar becomeFirstResponder];
+}
 
+- (void)setTexting:(BOOL)texting {
+    _texting = texting;
+    [self.tableView reloadData];
+}
+
+#pragma mark - UISearchBarDelegate
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+    [self onSearch:searchBar];
+}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
+    self.texting = YES;
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+#pragma mark - UISearchControllerDelegate
+-(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    NSLog(@"updateSearchResultsForSearchController");
+}
+
+#pragma mark - UITableViewDataSource
 //table 返回的行数
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    self.noUserView.hidden = YES;
     if (self.searchController.active) {
+        if(self.texting) {
+            return self.searchController.searchBar.text.length?1:0;
+        }
+        if(![self.searchList count]) {
+            self.noUserView.hidden = NO;
+        }
         return [self.searchList count];
     } else {
       return 0;
@@ -99,6 +147,10 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.searchController.active) {
+        if(self.texting) {
+            [self onSearch:nil];
+            return;
+        }
         WFCCUserInfo *userInfo = self.searchList[indexPath.row];
         
         WFCUProfileTableViewController *pvc = [[WFCUProfileTableViewController alloc] init];
@@ -111,37 +163,32 @@
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *flag = @"cell";
 
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:flag];
+    WFCUGeneralImageTextTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:flag];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:flag];
+        cell = [[WFCUGeneralImageTextTableViewCell alloc] initWithReuseIdentifier:flag cellHeight:CELL_HEIGHT];
     }
-    WFCCUserInfo *userInfo = self.searchList[indexPath.row];
-    [cell.textLabel setText:userInfo.displayName];
-    [cell.imageView sd_setImageWithURL:[NSURL URLWithString:[userInfo.portrait stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[WFCUImage imageNamed:@"PersonalChat"]];
+    if(self.texting) {
+        NSMutableAttributedString *attStr = [[NSMutableAttributedString alloc] initWithString:@"搜索："];
+        [attStr appendAttributedString:[[NSAttributedString alloc] initWithString:self.searchController.searchBar.text attributes:@{NSForegroundColorAttributeName : [UIColor blueColor]}]];
+        cell.titleLable.attributedText = attStr;
+        cell.portraitIV.image = [WFCUImage imageNamed:@"search_icon"];
+    } else {
+        WFCCUserInfo *userInfo = self.searchList[indexPath.row];
+        [cell.titleLable setText:userInfo.displayName];
+        [cell.portraitIV sd_setImageWithURL:[NSURL URLWithString:[userInfo.portrait stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[WFCUImage imageNamed:@"PersonalChat"]];
+    }
   
-  cell.userInteractionEnabled = YES;
   return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 56;
+    return CELL_HEIGHT;
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     if (self.searchController.active) {
         [self.searchController.searchBar resignFirstResponder];
     }
-}
-#pragma mark - UISearchControllerDelegate
--(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
-    if (self.timer.valid) {
-        [self.timer invalidate];
-        self.timer = nil;
-    }
-    
-    self.timer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(onSearch:) userInfo:nil repeats:NO];
-    
-    [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
 }
 
 - (void)onSearch:(id)sender {
@@ -153,8 +200,18 @@
                                                   page:0
                                                success:^(NSArray<WFCCUserInfo *> *machedUsers) {
                                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                                       ws.searchList = machedUsers;
-                                                       [ws.tableView reloadData];
+                                                       if([machedUsers count] == 1) {
+                                                           ws.texting = YES;
+                                                           WFCCUserInfo *userInfo = machedUsers[0];
+                                                           WFCUProfileTableViewController *pvc = [[WFCUProfileTableViewController alloc] init];
+                                                           pvc.userId = userInfo.userId;
+                                                           pvc.sourceType = FriendSource_Search;
+                                                           [ws.navigationController pushViewController:pvc animated:YES];
+                                                       } else {
+                                                           ws.texting = NO;
+                                                           ws.searchList = machedUsers;
+                                                           [ws.tableView reloadData];
+                                                       }
                                                    });
                                                }
                                                  error:^(int errorCode) {

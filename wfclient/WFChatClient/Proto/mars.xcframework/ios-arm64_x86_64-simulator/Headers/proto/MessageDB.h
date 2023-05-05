@@ -42,7 +42,8 @@ namespace mars {
             bool UpdateMessageTimeline(int64_t timeline, const std::string &node);
             bool UpdateRecvAndReadTimeline(int64_t timeline, bool isRead);
             bool UpdateGroupConvTimeline(int64_t timeline);
-            int64_t GetMessageTimeline(std::string &node, int64_t &recvHead, int64_t &readHead, int64_t &groupHead);
+            bool UpdateNoFtsTimeline(bool noFts);
+            int64_t GetMessageTimeline(std::string &node, int64_t &recvHead, int64_t &readHead, int64_t &groupHead, bool &noFts);
             int64_t GetSettingVersion();
             bool UpdateUserSettings(std::list<TUserSettingEntry> &settings);
             std::string GetUserSetting(int scope, const std::string &key);
@@ -60,8 +61,8 @@ namespace mars {
             bool isExistConversation(int conversationType, const std::string &target, int line);
             std::list<TConversation> GetConversationList(const std::list<int> &conversationTypes, const std::list<int> &lines);
             
-            bool RemoveConversation(int conversationType, const std::string &target, int line, bool clearMessage = false);
-            
+            bool RemoveConversation(int conversationType, const std::string &target, int line, bool clearMessage = false, bool sync = true);
+            bool RemoveGroupMessageBefore(const std::string &groupId, int64_t beforeTime);
             bool ClearMessages(int conversationType, const std::string &target, int line);
             bool ClearMessages(int conversationType, const std::string &target, int line, int64_t before);
             bool ClearUserMessages(const std::string &userId, int64_t start, int64_t end);
