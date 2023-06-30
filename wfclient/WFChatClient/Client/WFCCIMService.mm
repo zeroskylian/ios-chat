@@ -510,7 +510,7 @@ public:
     void onSuccess(const std::list<mars::stn::TMessage> &messageList) {
         NSMutableArray *messages = convertProtoMessageList(messageList, NO);
         dispatch_async(dispatch_get_main_queue(), ^{
-            if(messageList.empty()) {
+            if(messages.count) {
                 if (m_successBlock) {
                     m_successBlock(messages.firstObject);
                 }
@@ -3558,6 +3558,12 @@ public:
 - (void)setUserSetting:(UserSettingScope)scope key:(NSString *)key value:(NSString *)value
                success:(void(^)())successBlock
                  error:(void(^)(int error_code))errorBlock {
+    if(!key) {
+        key = @"";
+    }
+    if(!value) {
+        value = @"";
+    }
     mars::stn::modifyUserSetting((int)scope, [key UTF8String], [value UTF8String], new IMGeneralOperationCallback(^{
         if(successBlock) {
             successBlock();
