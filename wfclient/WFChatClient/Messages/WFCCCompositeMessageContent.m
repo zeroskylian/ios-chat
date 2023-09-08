@@ -241,6 +241,6 @@
 }
 
 - (NSString *)digest:(WFCCMessage *)message {
-    return [NSString stringWithFormat:@"[聊天记录]:%@", self.title];
+    return [NSString stringWithFormat:@"[聊天记录]%@", self.title];
 }
 @end
