@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1428,7 +1428,7 @@
 				CODE_SIGN_ENTITLEMENTS = WildFireChat/WildFireChat.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 106;
+				CURRENT_PROJECT_VERSION = 107;
 				DEVELOPMENT_TEAM = R9H33JX4W4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1449,7 +1449,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.36;
+				MARKETING_VERSION = 1.1.37;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = cn.wildfirechat.hengli.messanger;
 				PRODUCT_NAME = "野火IM";
@@ -1473,7 +1473,7 @@
 				CODE_SIGN_ENTITLEMENTS = WildFireChat/WildFireChat.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 106;
+				CURRENT_PROJECT_VERSION = 107;
 				DEVELOPMENT_TEAM = R9H33JX4W4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1494,7 +1494,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.36;
+				MARKETING_VERSION = 1.1.37;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = cn.wildfirechat.hengli.messanger;
 				PRODUCT_NAME = "野火IM";
@@ -1532,7 +1532,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.36;
+				MARKETING_VERSION = 1.1.37;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.wildfirechat.hengli.messanger.ShareExtension;
@@ -1565,7 +1565,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.36;
+				MARKETING_VERSION = 1.1.37;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.wildfirechat.hengli.messanger.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1595,7 +1595,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.36;
+				MARKETING_VERSION = 1.1.37;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.wildfirechat.hengli.messanger.Broadcast;
@@ -1626,7 +1626,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.36;
+				MARKETING_VERSION = 1.1.37;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.wildfirechat.hengli.messanger.Broadcast;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1656,7 +1656,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.36;
+				MARKETING_VERSION = 1.1.37;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.wildfirechat.hengli.messanger.BroadcastSetupUI;
@@ -1687,7 +1687,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.36;
+				MARKETING_VERSION = 1.1.37;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = cn.wildfirechat.hengli.messanger.BroadcastSetupUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
