@@ -1180,11 +1180,6 @@ static WFCCNetworkService * sharedSingleton = nil;
 
 // event reporting
 - (void)reportEvent_OnForeground:(BOOL)isForeground {
-    xgroup2_define(log_group);
-    xinfo2(TSF"reportEvent_OnForeground:%_\n", isForeground) >> log_group;
-    for (NSString *obj in [NSThread callStackSymbols]) {
-        xinfo2(TSF"%_\n", [obj UTF8String]) >> log_group;
-    }
     mars::baseevent::OnForeground(isForeground);
 }
 
