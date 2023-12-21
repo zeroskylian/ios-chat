@@ -836,12 +836,12 @@ static WFCCNetworkService * sharedSingleton = nil;
 }
 
 - (void)onAppSuspend {
-    NSString *text = [NSString stringWithFormat:@"onAppSuspend, _logined: %d", _logined];
-    [self printCustomlogToMars:text];
-    
     if (!_logined) {
         return;
     }
+    NSString *text = [NSString stringWithFormat:@"onAppSuspend, _logined: %d", _logined];
+    [self printCustomlogToMars:text];
+    
     
     [self reportEvent_OnForeground:NO];
     
@@ -920,12 +920,12 @@ static WFCCNetworkService * sharedSingleton = nil;
 }
 
 - (void)onAppResume {
-    NSString *text = [NSString stringWithFormat:@"onAppResume, _logined: %d, _firstTimeResume: %d", _logined, _firstTimeResume];
-    [self printCustomlogToMars:text];
+
   if (!_logined) {
     return;
   }
-    
+    NSString *text = [NSString stringWithFormat:@"onAppResume, _logined: %d, _firstTimeResume: %d", _logined, _firstTimeResume];
+    [self printCustomlogToMars:text];
   //首次启动也会有Resume事件，这里需要忽略，不然会启动后连接成功后再重新连接。
   if(_firstTimeResume) {
     _firstTimeResume = NO;
@@ -1213,7 +1213,8 @@ static WFCCNetworkService * sharedSingleton = nil;
 }
 
 - (void)printCustomlogToMars: (NSString *)text {
-    xinfo2(TSF"printXlog:%_\n", text);
+    xgroup2_define(log_group1);
+    xinfo2(TSF"printXlog:%_\n", text.UTF8String) >> log_group1;
 }
 
 - (void)reportEvent_OnForeground:(BOOL)isForeground {
