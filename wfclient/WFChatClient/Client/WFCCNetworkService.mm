@@ -836,6 +836,9 @@ static WFCCNetworkService * sharedSingleton = nil;
 }
 
 - (void)onAppSuspend {
+    NSString *text = [NSString stringWithFormat:@"onAppSuspend, _logined: %d", _logined];
+    [self printCustomlogToMars:text];
+    
     if (!_logined) {
         return;
     }
