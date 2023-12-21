@@ -102,6 +102,12 @@ public:
         [m_delegate onConnectToServer:[NSString stringWithUTF8String:host.c_str()] ip:[NSString stringWithUTF8String:ip.c_str()] port:port];
     }
   }
+    
+    void OnConnected(const std::string &host, const std::string &ip, int port, bool mainNW) {
+        if (m_delegate) {
+            [m_delegate onConnected:[NSString stringWithUTF8String:host.c_str()] ip:[NSString stringWithUTF8String:ip.c_str()] port:port mainNw:mainNW];
+        }
+    }
   id<ConnectToServerDelegate> m_delegate;
 };
 
@@ -542,6 +548,8 @@ public:
 @property(nonatomic, assign)NSUInteger backgroudRunTime;
 
 @property(nonatomic, assign)BOOL firstTimeResume;
+
+@property (nonatomic, assign)BOOL connectedToMainNetwork;
 @end
 
 @implementation WFCCNetworkService
@@ -742,6 +750,15 @@ static WFCCNetworkService * sharedSingleton = nil;
 - (void)onConnectToServer:(NSString *)host ip:(NSString *)ip port:(int)port {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.connectToServerDelegate onConnectToServer:host ip:ip port:port];
+    });
+}
+
+- (void)onConnected:(NSString *)host ip:(NSString *)ip port:(int)port mainNw:(BOOL)mainNw {
+    self.connectedToMainNetwork = mainNw;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if([self.connectToServerDelegate respondsToSelector:@selector(onConnected:ip:port:mainNw:)]) {
+            [self.connectToServerDelegate onConnected:host ip:ip port:port mainNw:mainNw];
+        }
     });
 }
 
