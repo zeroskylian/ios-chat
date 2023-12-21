@@ -917,6 +917,8 @@ static WFCCNetworkService * sharedSingleton = nil;
 }
 
 - (void)onAppResume {
+    NSString *text = [NSString stringWithFormat:@"onAppResume, _logined: %d, _firstTimeResume: %d", _logined, _firstTimeResume];
+    [self printCustomlogToMars:text];
   if (!_logined) {
     return;
   }
@@ -973,6 +975,7 @@ static WFCCNetworkService * sharedSingleton = nil;
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+          xinfo2(TSF"connect when background");
           [self onAppSuspend];
         }
       });
@@ -1039,6 +1042,7 @@ static WFCCNetworkService * sharedSingleton = nil;
 
 - (void)forceConnectTimeOut {
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+        xinfo2(TSF"forceConnectTimeOut");
         [self onAppSuspend];
     }
 }
@@ -1047,6 +1051,7 @@ static WFCCNetworkService * sharedSingleton = nil;
     __weak typeof(self)ws = self;
   dispatch_async(dispatch_get_main_queue(), ^{
     if (ws.logined &&[UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+        xinfo2(TSF"forceConnect");
         [self onAppResume];
         [self startBackgroundTask];
         if(second > 0) {
@@ -1068,6 +1073,7 @@ static WFCCNetworkService * sharedSingleton = nil;
             ws.forceConnectTimer = nil;
         }
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+        xinfo2(TSF"cancelForceConnect");
         [self onAppSuspend];
     }
     });
@@ -1195,8 +1201,20 @@ static WFCCNetworkService * sharedSingleton = nil;
 }
 
 
-// event reporting
+- (void)printOnForegroundLog:(BOOL)isForeground {
+    xgroup2_define(log_group);
+    xinfo2(TSF"reportEvent_OnForeground:%_\n", isForeground) >> log_group;
+    for (NSString *obj in [NSThread callStackSymbols]) {
+        xinfo2(TSF"%_\n", [obj UTF8String]) >> log_group;
+    }
+}
+
+- (void)printCustomlogToMars: (NSString *)text {
+    xinfo2(TSF"printXlog:%_\n", text);
+}
+
 - (void)reportEvent_OnForeground:(BOOL)isForeground {
+    [self printOnForegroundLog:isForeground];
     mars::baseevent::OnForeground(isForeground);
 }
 

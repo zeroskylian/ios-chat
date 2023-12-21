@@ -480,6 +480,10 @@ typedef NS_ENUM(NSInteger, ConnectionStatus) {
  获取协议栈版本
  */
 - (NSString *)getProtoRevision;
+
+/// 输入自定义日志
+/// - Parameter text: 文字内容
+- (void)printCustomlogToMars: (NSString *)text;
 @end
 
 #endif
