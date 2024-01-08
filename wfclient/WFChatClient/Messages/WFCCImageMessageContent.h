@@ -52,4 +52,10 @@
 
 -(void)setImageSize:(CGSize)size;
 
+
+/// 发送png原图
+/// - Parameters:
+///   - image: 原图
+///   - path: image Content
++ (instancetype)pngImageContent:(UIImage *)image cachePath:(NSString *)path;
 @end
