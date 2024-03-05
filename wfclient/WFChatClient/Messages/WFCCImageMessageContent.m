@@ -46,6 +46,16 @@
     return content;
 }
 
++ (instancetype)jpegImageContent:(UIImage *)image cachePath:(NSString *)path {
+    WFCCImageMessageContent *content = [[WFCCImageMessageContent alloc] init];
+    NSData *imgData = UIImageJPEGRepresentation(image, 1);
+    [imgData writeToFile:path atomically:YES];
+    content.localPath = path;
+    content.size = image.size;
+    content.thumbnail = [WFCCUtilities generateThumbnail:image withWidth:120 withHeight:120];
+    return content;
+}
+
 - (WFCCMessagePayload *)encode {
     WFCCMediaMessagePayload *payload = (WFCCMediaMessagePayload *)[super encode];
     payload.searchableContent = @"[图片]";
