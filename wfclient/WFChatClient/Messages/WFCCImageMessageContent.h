@@ -56,6 +56,12 @@
 /// 发送png原图
 /// - Parameters:
 ///   - image: 原图
-///   - path: image Content
+///   - path: 图片缓存路径
 + (instancetype)pngImageContent:(UIImage *)image cachePath:(NSString *)path;
+
+/// 发送 jpeg 原图
+/// - Parameters:
+///   - image: 图片
+///   - path: 图片缓存路径
++ (instancetype)jpegImageContent:(UIImage *)image cachePath:(NSString *)path;
 @end
