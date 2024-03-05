@@ -12,8 +12,8 @@
 #import "WFCCUtilities.h"
 #import "Common.h"
 
-
 @implementation WFCCImageMessageContent
+
 + (instancetype)contentFrom:(UIImage *)image cachePath:(NSString *)path {
     return [WFCCImageMessageContent contentFrom:image cachePath:path fullImage:NO];
 }
@@ -27,7 +27,6 @@
     
     NSData *imgData = UIImageJPEGRepresentation(image, 0.85);
         
-    
     [imgData writeToFile:path atomically:YES];
     
     content.localPath = path;
@@ -52,12 +51,14 @@
     payload.searchableContent = @"[图片]";
     
     NSMutableDictionary *dataDict = [NSMutableDictionary dictionary];
-    if (self.thumbParameter.length && self.size.width > 0) {
+    
+    if (self.size.width > 0) {
         [dataDict setValue:self.thumbParameter forKey:@"tp"];
         [dataDict setValue:@(self.size.width) forKey:@"w"];
         [dataDict setValue:@(self.size.height) forKey:@"h"];
-    } else if (![[WFCCIMService sharedWFCIMService] imageThumbPara]) {
-        dataDict = nil;
+    }
+    
+    if (![[WFCCIMService sharedWFCIMService] imageThumbPara]) {
         if(!self.thumbnail && self.localPath.length) {
             UIImage *image = [UIImage imageWithContentsOfFile:self.localPath];
             if(image) {
@@ -73,7 +74,6 @@
             [dataDict setValue:@(image.size.height) forKey:@"h"];
         } else {
             payload.binaryContent = UIImageJPEGRepresentation(self.thumbnail, 0.45);
-            dataDict = nil;
         }
     }
     
