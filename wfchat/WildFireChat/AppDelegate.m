@@ -228,8 +228,6 @@
     [self updateBadgeNumber];
     
     [self prepardDataForShareExtension];
-    
-    [WFCCNetworkService.sharedInstance printCustomlogToMars:@"applicationDidEnterBackground"];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -240,10 +238,11 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    //从后台回到前台时，如果是在来电状态，需要播放来电铃声。
+    // 从后台回到前台时，如果是在来电状态，需要播放来电铃声。
     if([WFAVEngineKit sharedEngineKit].currentSession.state == kWFAVEngineStateIncomming) {
         [self shouldStartRing:YES];
     }
+    [WFCCNetworkService.sharedInstance printCustomlogToMars:@"applicationDidBecomeActive"];
 }
 
 
