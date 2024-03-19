@@ -125,18 +125,18 @@
 }
 
 - (UIImage *)thumbnail {
-    if(_thumbnail == [WFCCIMService sharedWFCIMService].defaultThumbnailImage) {
-        _thumbnail = nil;
-    }
+//    if(_thumbnail == [WFCCIMService sharedWFCIMService].defaultThumbnailImage) {
+//        _thumbnail = nil;
+//    }
     if (!_thumbnail && self.localPath.length && [[NSFileManager defaultManager] isExecutableFileAtPath:self.localPath]) {
         UIImage *image = [UIImage imageWithContentsOfFile:self.localPath];
         if(image) {
             _thumbnail = [WFCCUtilities generateThumbnail:image withWidth:120 withHeight:120];
         }
     }
-    if(!_thumbnail) {
-        _thumbnail = [WFCCIMService sharedWFCIMService].defaultThumbnailImage;
-    }
+//    if(!_thumbnail) {
+//        _thumbnail = [WFCCIMService sharedWFCIMService].defaultThumbnailImage;
+//    }
     return _thumbnail;
 }
 
