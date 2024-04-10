@@ -401,7 +401,11 @@
         if(self.conversation.type == Single_Type) {
             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[WFCUImage imageNamed:@"nav_chat_single"] style:UIBarButtonItemStyleDone target:self action:@selector(onRightBarBtn:)];
         } else if(self.conversation.type == Group_Type) {
-            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[WFCUImage imageNamed:@"nav_chat_group"] style:UIBarButtonItemStyleDone target:self action:@selector(onRightBarBtn:)];
+            if(!self.targetGroup || self.targetGroup.deleted) {
+                self.navigationItem.rightBarButtonItem = nil;
+            } else {
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[WFCUImage imageNamed:@"nav_chat_group"] style:UIBarButtonItemStyleDone target:self action:@selector(onRightBarBtn:)];
+            }
         } else if(self.conversation.type == Channel_Type) {
             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[WFCUImage imageNamed:@"nav_chat_channel"] style:UIBarButtonItemStyleDone target:self action:@selector(onRightBarBtn:)];
         } else if(self.conversation.type == SecretChat_Type) {
@@ -773,7 +777,11 @@
             self.title = WFCString(@"GroupChat");
             self.navigationItem.backBarButtonItem.title = WFCString(@"Message");
         } else {
-            self.title = [NSString stringWithFormat:@"%@(%d)", self.targetGroup.displayName, (int)self.targetGroup.memberCount];
+            if(self.targetGroup.deleted) {
+                self.title = [NSString stringWithFormat:@"%@(%@)", self.targetGroup.displayName, @"已删除"];
+            } else {
+                self.title = [NSString stringWithFormat:@"%@(%d)", self.targetGroup.displayName, (int)self.targetGroup.memberCount];
+            }
             self.navigationItem.backBarButtonItem.title = self.targetGroup.displayName;
         }
     } else if(self.conversation.type == Channel_Type) {
@@ -803,10 +811,13 @@
 - (void)setTargetGroup:(WFCCGroupInfo *)targetGroup {
     _targetGroup = targetGroup;
     [self updateTitle];
+    [self setupNavigationItem];
     
     ChatInputBarStatus defaultStatus = ChatInputBarDefaultStatus;
     WFCCGroupMember *member = [[WFCCIMService sharedWFCIMService] getGroupMember:targetGroup.target memberId:[WFCCNetworkService sharedInstance].userId];
-    if (targetGroup.mute || member.type == Member_Type_Muted) {
+    if(targetGroup.deleted) {
+        self.chatInputBar.inputBarStatus = ChatInputBarMuteStatus;
+    } else if (targetGroup.mute || member.type == Member_Type_Muted) {
         if ([targetGroup.owner isEqualToString:[WFCCNetworkService sharedInstance].userId]) {
             self.chatInputBar.inputBarStatus =  defaultStatus;
         } else if(targetGroup.mute && member.type == Member_Type_Allowed) {
@@ -2075,6 +2086,7 @@
     [self modelOfMessage:self.playingMessageId].voicePlaying = NO;
     self.playingMessageId = 0;
     [[NSNotificationCenter defaultCenter] postNotificationName:kVoiceMessagePlayStoped object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
 }
 
 -(void)prepardToPlay:(WFCUMessageModel *)model {
@@ -2108,6 +2120,36 @@
     }
 }
 
+- (BOOL)isPluginHeadPhonesOrConnectedBluetooth {
+    for(AVAudioSessionPortDescription *output in [AVAudioSession sharedInstance].currentRoute.outputs) {
+        if(output.portType == AVAudioSessionPortHeadphones || output.portType == AVAudioSessionPortBluetoothA2DP || output.portType == AVAudioSessionPortBluetoothLE) {
+            return YES;
+        }
+    }
+    return false;
+}
+
+- (void)handleRouteChange:(NSNotification*)notification {
+    AVAudioSessionRouteChangeReason reason = [notification.userInfo[@"AVAudioSessionRouteChangeReasonKey"] intValue];
+    switch (reason) {
+        case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
+        case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
+        {
+            AVAudioSession *session = [AVAudioSession sharedInstance];
+            if([self isPluginHeadPhonesOrConnectedBluetooth]) {
+                [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone
+                                           error:nil];
+            } else {
+                [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
+                                           error:nil];
+            }
+        }
+            break;   
+        default:
+            break;
+    }
+}
+
 -(void)startPlay:(WFCUMessageModel *)model {
     if(model.message.conversation.type == SecretChat_Type) {
         [[WFCCIMService sharedWFCIMService] setMediaMessagePlayed:model.message.messageId];
@@ -2120,9 +2162,15 @@
         AVAudioSession *session = [AVAudioSession sharedInstance];
         [session setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
         
-        [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
-                                   error:nil];
+        if([self isPluginHeadPhonesOrConnectedBluetooth]) {
+            [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone
+                                       error:nil];
+        } else {
+            [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
+                                       error:nil];
+        }
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleRouteChange:) name:AVAudioSessionRouteChangeNotification object:nil];
     
         
         WFCCSoundMessageContent *snc = (WFCCSoundMessageContent *)model.message.content;
@@ -2150,7 +2198,6 @@
         WFCCVideoMessageContent *videoMsg = (WFCCVideoMessageContent *)model.message.content;
         NSURL *url = [NSURL URLWithString:videoMsg.remoteUrl];
 
-        
         if (!url) {
             [self.view makeToast:@"无法播放"];
             return;
@@ -2167,7 +2214,6 @@
         
         [self.videoPlayerViewController playVideoWithTitle:@" " URL:url videoID:nil shareURL:nil isStreaming:NO playInFullScreen:YES];
     }
-    
 }
 
 #pragma mark - UICollectionViewDataSource
