@@ -84,8 +84,7 @@
         self.messageUid = [dictData[@"u"] longLongValue];
         self.userId = dictData[@"i"];
         self.userDisplayName = dictData[@"n"];
-//        self.messageDigest = dictData[@"d"];
-        id messageDigest = dictData[@"messageDigest"];
+        id messageDigest = dictData[@"d"];
         if([messageDigest isKindOfClass:NSString.class]) {
             self.messageDigest = messageDigest;
         }
