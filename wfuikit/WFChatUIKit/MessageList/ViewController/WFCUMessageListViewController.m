@@ -401,7 +401,7 @@
         if(self.conversation.type == Single_Type) {
             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[WFCUImage imageNamed:@"nav_chat_single"] style:UIBarButtonItemStyleDone target:self action:@selector(onRightBarBtn:)];
         } else if(self.conversation.type == Group_Type) {
-            if(!self.targetGroup || self.targetGroup.deleted) {
+            if(!self.targetGroup || self.targetGroup.deleted || self.targetGroup.memberDt < 0) {
                 self.navigationItem.rightBarButtonItem = nil;
             } else {
                 self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[WFCUImage imageNamed:@"nav_chat_group"] style:UIBarButtonItemStyleDone target:self action:@selector(onRightBarBtn:)];
@@ -779,6 +779,8 @@
         } else {
             if(self.targetGroup.deleted) {
                 self.title = [NSString stringWithFormat:@"%@(%@)", self.targetGroup.displayName, @"已删除"];
+            } else if(self.targetGroup.memberDt < 0) {
+                self.title = [NSString stringWithFormat:@"%@(%@)", self.targetGroup.displayName, @"已退出"];
             } else {
                 self.title = [NSString stringWithFormat:@"%@(%d)", self.targetGroup.displayName, (int)self.targetGroup.memberCount];
             }
@@ -815,7 +817,7 @@
     
     ChatInputBarStatus defaultStatus = ChatInputBarDefaultStatus;
     WFCCGroupMember *member = [[WFCCIMService sharedWFCIMService] getGroupMember:targetGroup.target memberId:[WFCCNetworkService sharedInstance].userId];
-    if(targetGroup.deleted) {
+    if(targetGroup.deleted || targetGroup.memberDt < 0) {
         self.chatInputBar.inputBarStatus = ChatInputBarMuteStatus;
     } else if (targetGroup.mute || member.type == Member_Type_Muted) {
         if ([targetGroup.owner isEqualToString:[WFCCNetworkService sharedInstance].userId]) {
@@ -1348,6 +1350,15 @@
                     break;
                 }
             }
+        } else {
+            for (int i = 0; i < self.modelList.count; i++) {
+                WFCUMessageModel *model = [self.modelList objectAtIndex:i];
+                if (model.message.messageUid == messageUid) {
+                    [self.modelList removeObject:model];
+                    [self.collectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:i inSection:0]]];
+                    break;
+                }
+            }
         }
     } else {
         for (int i = 0; i < self.modelList.count; i++) {
@@ -1385,6 +1396,11 @@
         if(model.message.messageId == messageId) {
             if(model.message.conversation.type != Chatroom_Type) {
                 model.message = [[WFCCIMService sharedWFCIMService] getMessage:messageId];
+                if(!model.message) {
+                    [self.modelList removeObject:model];
+                    isUpdated = YES;
+                    break;
+                }
             }
             isUpdated = YES;
             break;
@@ -2087,21 +2103,18 @@
     self.playingMessageId = 0;
     [[NSNotificationCenter defaultCenter] postNotificationName:kVoiceMessagePlayStoped object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:AVAudioSessionRouteChangeNotification object:nil];
+    [self removeProximityMonitoringObserver];
 }
 
 -(void)prepardToPlay:(WFCUMessageModel *)model {
-    
     if (self.playingMessageId == model.message.messageId) {
         [self stopPlayer];
     } else {
         [self stopPlayer];
-        
         self.playingMessageId = model.message.messageId;
-        
         WFCCSoundMessageContent *soundContent = (WFCCSoundMessageContent *)model.message.content;
         if (soundContent.localPath.length == 0 || ![WFCUUtilities isFileExist:soundContent.localPath]) {
             __weak typeof(self) weakSelf = self;
-            
             BOOL isDownloading = [[WFCUMediaMessageDownloader sharedDownloader] tryDownload:model.message success:^(long long messageUid, NSString *localPath) {
                 model.mediaDownloading = NO;
                 [weakSelf startPlay:model];
@@ -2112,11 +2125,9 @@
             if (isDownloading) {
                 model.mediaDownloading = YES;
             }
-            
         } else {
             [self startPlay:model];
         }
-        
     }
 }
 
@@ -2136,7 +2147,8 @@
         case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
         {
             AVAudioSession *session = [AVAudioSession sharedInstance];
-            if([self isPluginHeadPhonesOrConnectedBluetooth]) {
+            UIDevice *device = [UIDevice currentDevice];
+            if([self isPluginHeadPhonesOrConnectedBluetooth] || device.proximityState) {
                 [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone
                                            error:nil];
             } else {
@@ -2150,6 +2162,24 @@
     }
 }
 
+- (void)addProximityMonitoringObserver {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(proximityStatueChanged:)
+                                                 name:UIDeviceProximityStateDidChangeNotification
+                                               object:nil];
+        [UIDevice currentDevice].proximityMonitoringEnabled = YES;
+}
+
+- (void)removeProximityMonitoringObserver {
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:UIDeviceProximityStateDidChangeNotification
+                                                      object:nil];
+        [UIDevice currentDevice].proximityMonitoringEnabled = NO;
+}
+
+- (void)proximityStatueChanged:(NSNotificationCenter *)notification {
+}
+
 -(void)startPlay:(WFCUMessageModel *)model {
     if(model.message.conversation.type == SecretChat_Type) {
         [[WFCCIMService sharedWFCIMService] setMediaMessagePlayed:model.message.messageId];
@@ -2158,20 +2188,16 @@
     }
     
     if ([model.message.content isKindOfClass:[WFCCSoundMessageContent class]]) {
-        // Setup audio session
         AVAudioSession *session = [AVAudioSession sharedInstance];
         [session setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
-        
-        if([self isPluginHeadPhonesOrConnectedBluetooth]) {
-            [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone
-                                       error:nil];
+        UIDevice *device = [UIDevice currentDevice];
+        if([self isPluginHeadPhonesOrConnectedBluetooth] || device.proximityState) {
+            [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:nil];
         } else {
-            [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
-                                       error:nil];
+            [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
         }
-        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleRouteChange:) name:AVAudioSessionRouteChangeNotification object:nil];
-    
+        [self addProximityMonitoringObserver];
         
         WFCCSoundMessageContent *snc = (WFCCSoundMessageContent *)model.message.content;
         NSError *error = nil;
@@ -3067,8 +3093,7 @@
 #if WFCU_SUPPORT_VOIP
 - (void)didTouchVideoBtn:(BOOL)isAudioOnly {
     if(self.conversation.type == Single_Type || self.conversation.type == SecretChat_Type) {
-        WFCUVideoViewController *videoVC = [[WFCUVideoViewController alloc] initWithTargets:@[self.conversation.target] conversation:self.conversation audioOnly:isAudioOnly];
-        [[WFAVEngineKit sharedEngineKit] presentViewController:videoVC];
+        [self startCall:@[self.conversation.target] isMulti:NO conversation:self.conversation audioOnly:isAudioOnly];
     } else {
         //      WFCUContactListViewController *pvc = [[WFCUContactListViewController alloc] init];
         //      pvc.selectContact = YES;
@@ -3095,18 +3120,40 @@
         vc.type = Vertical;
         __weak typeof(self)ws = self;
         vc.selectResult = ^(NSArray<NSString *> * _Nonnull contacts) {
-            UIViewController *videoVC;
-            if (ws.conversation.type == Group_Type && [WFAVEngineKit sharedEngineKit].supportMultiCall) {
-                videoVC = [[WFCUMultiVideoViewController alloc] initWithTargets:contacts conversation:ws.conversation audioOnly:isAudioOnly];
-            } else {
-                videoVC = [[WFCUVideoViewController alloc] initWithTargets:contacts conversation:ws.conversation audioOnly:isAudioOnly];
-            }
-            [[WFAVEngineKit sharedEngineKit] presentViewController:videoVC];
+            [self startCall:contacts isMulti:ws.conversation.type == Group_Type conversation:self.conversation audioOnly:isAudioOnly];
         };
         UINavigationController *navi = [[UINavigationController alloc] initWithRootViewController:vc];
         navi.modalPresentationStyle = UIModalPresentationFullScreen;
         [self.navigationController presentViewController:navi animated:YES completion:nil];
     }
+}
+
+- (void)startCall:(NSArray<NSString *> *)targetIds isMulti:(BOOL)isMulti conversation:(WFCCConversation *)conversation audioOnly:(BOOL)isAudioOnly {
+    [WFCUUtilities checkRecordOrCameraPermission:YES complete:^(BOOL granted) {
+        if(granted) {
+            if(isAudioOnly) {
+                UIViewController *videoVC;
+                if(isMulti) {
+                    videoVC = [[WFCUMultiVideoViewController alloc] initWithTargets:targetIds conversation:conversation audioOnly:isAudioOnly];
+                } else {
+                    videoVC = [[WFCUVideoViewController alloc] initWithTargets:targetIds conversation:conversation audioOnly:isAudioOnly];
+                }
+                [[WFAVEngineKit sharedEngineKit] presentViewController:videoVC];
+            } else {
+                [WFCUUtilities checkRecordOrCameraPermission:NO complete:^(BOOL granted) {
+                    if(granted) {
+                        UIViewController *videoVC;
+                        if(isMulti) {
+                            videoVC = [[WFCUMultiVideoViewController alloc] initWithTargets:targetIds conversation:conversation audioOnly:isAudioOnly];
+                        } else {
+                            videoVC = [[WFCUVideoViewController alloc] initWithTargets:targetIds conversation:conversation audioOnly:isAudioOnly];
+                        }
+                        [[WFAVEngineKit sharedEngineKit] presentViewController:videoVC];
+                    }
+                } viewController:self];
+            }
+        }
+    } viewController:self];
 }
 #endif
 
@@ -3385,11 +3432,16 @@
                 if (cell.model.message.messageId == messageId) {
                     if(messageId > 0) {
                         cell.model.message = [[WFCCIMService sharedWFCIMService] getMessage:messageId];
+                        if(cell.model.message) {
+                            [ws.collectionView reloadItemsAtIndexPaths:@[[ws.collectionView indexPathForCell:cell]]];
+                        } else {
+                            [self.modelList removeObject:cell.model];
+                            [ws.collectionView deleteItemsAtIndexPaths:@[[ws.collectionView indexPathForCell:cell]]];
+                        }
+                        [ws updateQuotedMessageWhenRecall:ws.cell4Menu.model.message.messageUid];
                     } else {
                         //client will replace the message content
                     }
-                    [ws.collectionView reloadItemsAtIndexPaths:@[[ws.collectionView indexPathForCell:cell]]];
-                    [ws updateQuotedMessageWhenRecall:ws.cell4Menu.model.message.messageUid];
                 }
             });
         } error:^(int error_code) {

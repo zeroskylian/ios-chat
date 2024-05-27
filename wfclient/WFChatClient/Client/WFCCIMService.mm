@@ -2357,6 +2357,7 @@ WFCCGroupInfo *convertProtoGroupInfo(const mars::stn::TGroupInfo &tgi) {
     groupInfo.superGroup = tgi.superGroup;
     groupInfo.deleted = tgi.deleted;
     groupInfo.updateDt = tgi.updateDt;
+    groupInfo.memberDt = tgi.memberDt;
     
     if(!groupInfo.portrait.length && [WFCCNetworkService sharedInstance].defaultPortraitProvider && [[WFCCNetworkService sharedInstance].defaultPortraitProvider respondsToSelector:@selector(groupDefaultPortrait:memberInfos:)]) {
         __block NSMutableArray<WFCCUserInfo *> *memberUserInfos = [[NSMutableArray alloc] init];
@@ -2818,6 +2819,25 @@ WFCCGroupInfo *convertProtoGroupInfo(const mars::stn::TGroupInfo &tgi) {
     }];
 }
 
+- (BOOL)isAddFriendNeedVerify {
+    NSString *strValue = [[WFCCIMService sharedWFCIMService] getUserSetting:UserSettingScope_AddFriend_NoVerify key:@""];
+    return ![strValue isEqualToString:@"1"];
+}
+
+- (void)setAddFriendNeedVerify:(BOOL)enable
+                success:(void(^)(void))successBlock
+                  error:(void(^)(int error_code))errorBlock {
+    [[WFCCIMService sharedWFCIMService] setUserSetting:UserSettingScope_AddFriend_NoVerify key:@"" value:enable?@"0":@"1" success:^{
+        if (successBlock) {
+            successBlock();
+        }
+    } error:^(int error_code) {
+        if (errorBlock) {
+            errorBlock(error_code);
+        }
+    }];
+}
+
 - (void)getNoDisturbingTimes:(void(^)(int startMins, int endMins))resultBlock
                        error:(void(^)(int error_code))errorBlock {
     NSString *strValue = [[WFCCIMService sharedWFCIMService] getUserSetting:UserSettingScope_No_Disturbing key:@""];
@@ -3253,7 +3273,15 @@ WFCCGroupInfo *convertProtoGroupInfo(const mars::stn::TGroupInfo &tgi) {
     notifyContent:(WFCCMessageContent *)notifyContent
           success:(void(^)())successBlock
             error:(void(^)(int error_code))errorBlock {
+    [self quitGroup:groupId keepMessage:false notifyLines:notifyLines notifyContent:notifyContent success:successBlock error:errorBlock];
+}
 
+- (void)quitGroup:(NSString *)groupId
+        keepMessage:(BOOL)keepMessage
+      notifyLines:(NSArray<NSNumber *> *)notifyLines
+    notifyContent:(WFCCMessageContent *)notifyContent
+          success:(void(^)(void))successBlock
+              error:(void(^)(int error_code))errorBlock {
     if(groupId.length == 0) {
         if(errorBlock) {
             errorBlock(-1);
@@ -3269,7 +3297,7 @@ WFCCGroupInfo *convertProtoGroupInfo(const mars::stn::TGroupInfo &tgi) {
         lines.push_back([number intValue]);
     }
     
-    mars::stn::quitGroup([groupId UTF8String], lines, tcontent, new IMGeneralOperationCallback(successBlock, errorBlock));
+    mars::stn::quitGroup([groupId UTF8String], lines, tcontent, new IMGeneralOperationCallback(successBlock, errorBlock), keepMessage);
 }
 
 - (void)dismissGroup:(NSString *)groupId
