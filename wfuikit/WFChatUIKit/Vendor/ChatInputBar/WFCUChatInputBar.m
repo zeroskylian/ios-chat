@@ -318,7 +318,7 @@
 }
 
 - (void)onTouchDown:(id)sender {
-    if ([self canRecord]) {
+    if ([self canRecordNow]) {
         _recordView = [[WFCUVoiceRecordView alloc] initWithFrame:CGRectMake(self.parentView.bounds.size.width/2 - 70, self.parentView.bounds.size.height/2 - 70, 140, 140)];
         _recordView.center = self.parentView.center;
         [self.parentView addSubview:_recordView];
@@ -482,25 +482,10 @@
     [self recordCancel];
 }
 
-- (BOOL)canRecord {
-    __block BOOL bCanRecord = YES;
-    
-    if ([[AVAudioSession sharedInstance]
-         respondsToSelector:@selector(requestRecordPermission:)]) {
-        [[AVAudioSession sharedInstance] requestRecordPermission:^(BOOL granted) {
-            bCanRecord = granted;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                bCanRecord = granted;
-                if (granted) {
-                    bCanRecord = YES;
-                } else {
-                    
-                }
-            });
-        }];
-    }
-    
-    return bCanRecord;
+- (BOOL)canRecordNow {
+    return [WFCUUtilities checkRecordOrCameraPermission:YES complete:^(BOOL granted) {
+        
+    } viewController:[self.delegate requireNavi]];
 }
 
 - (void)timerFired:(NSTimer*)timer {
@@ -994,6 +979,7 @@
     self.backupFrame = frame;
     [UIView animateWithDuration:duration animations:^{
         self.frame = frame;
+        self.inputContainer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
     }];
 }
 
@@ -1006,6 +992,7 @@
     self.backupFrame = frame;
     [UIView animateWithDuration:duration animations:^{
         self.frame = frame;
+        self.inputContainer.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
     }];
     
     if(self.inputBarStatus == ChatInputBarKeyboardStatus || self.inputBarStatus == ChatInputBarPluginStatus || self.inputBarStatus == ChatInputBarEmojiStatus) {
@@ -1138,6 +1125,7 @@
     
     [UIView animateWithDuration:0.5 animations:^{
         self.frame = baseFrame;
+        self.inputContainer.frame = CGRectMake(0, 0, baseFrame.size.width, baseFrame.size.height);
         self.voiceSwitchBtn.frame = voiceFrame;
         self.emojSwitchBtn.frame = emojFrame;
         self.pluginSwitchBtn.frame = extendFrame;
@@ -1378,6 +1366,7 @@
         ws.textInputView.frame = tvFrame;
         ws.inputCoverView.frame = ws.textInputView.bounds;
         self.frame = baseFrame;
+        self.inputContainer.frame = CGRectMake(0, 0, baseFrame.size.width, baseFrame.size.height);
         self.voiceSwitchBtn.frame = voiceFrame;
         self.emojSwitchBtn.frame = emojFrame;
         self.pluginSwitchBtn.frame = extendFrame;
