@@ -12,8 +12,8 @@
 #import "WFCCUtilities.h"
 #import "Common.h"
 
-
 @implementation WFCCImageMessageContent
+
 + (instancetype)contentFrom:(UIImage *)image cachePath:(NSString *)path {
     return [WFCCImageMessageContent contentFrom:image cachePath:path fullImage:NO];
 }
@@ -27,7 +27,6 @@
     
     NSData *imgData = UIImageJPEGRepresentation(image, 0.85);
         
-    
     [imgData writeToFile:path atomically:YES];
     
     content.localPath = path;
@@ -37,19 +36,39 @@
     return content;
 }
 
++ (instancetype)pngImageContent:(UIImage *)image cachePath:(NSString *)path {
+    WFCCImageMessageContent *content = [[WFCCImageMessageContent alloc] init];
+    NSData *imgData = UIImagePNGRepresentation(image);
+    [imgData writeToFile:path atomically:YES];
+    content.localPath = path;
+    content.size = image.size;
+    content.thumbnail = [WFCCUtilities generateThumbnail:image withWidth:120 withHeight:120];
+    return content;
+}
+
++ (instancetype)jpegImageContent:(UIImage *)image cachePath:(NSString *)path {
+    WFCCImageMessageContent *content = [[WFCCImageMessageContent alloc] init];
+    NSData *imgData = UIImageJPEGRepresentation(image, 1);
+    [imgData writeToFile:path atomically:YES];
+    content.localPath = path;
+    content.size = image.size;
+    content.thumbnail = [WFCCUtilities generateThumbnail:image withWidth:120 withHeight:120];
+    return content;
+}
+
 - (WFCCMessagePayload *)encode {
     WFCCMediaMessagePayload *payload = (WFCCMediaMessagePayload *)[super encode];
     payload.searchableContent = @"[图片]";
     
     NSMutableDictionary *dataDict = [NSMutableDictionary dictionary];
-    if (self.thumbParameter.length && self.size.width > 0) {
+    
+    if (self.size.width > 0) {
         [dataDict setValue:self.thumbParameter forKey:@"tp"];
         [dataDict setValue:@(self.size.width) forKey:@"w"];
         [dataDict setValue:@(self.size.height) forKey:@"h"];
     }
     
     if (![[WFCCIMService sharedWFCIMService] imageThumbPara]) {
-        dataDict = nil;
         if(!self.thumbnail && self.localPath.length) {
             UIImage *image = [UIImage imageWithContentsOfFile:self.localPath];
             if(image) {
@@ -65,7 +84,6 @@
             [dataDict setValue:@(image.size.height) forKey:@"h"];
         } else {
             payload.binaryContent = UIImageJPEGRepresentation(self.thumbnail, 0.45);
-            dataDict = nil;
         }
     }
     
@@ -107,18 +125,15 @@
 }
 
 - (UIImage *)thumbnail {
-    if(_thumbnail == [WFCCIMService sharedWFCIMService].defaultThumbnailImage) {
-        _thumbnail = nil;
-    }
-    
     if (!_thumbnail && self.localPath.length && [[NSFileManager defaultManager] isExecutableFileAtPath:self.localPath]) {
         UIImage *image = [UIImage imageWithContentsOfFile:self.localPath];
-        _thumbnail = [WFCCUtilities generateThumbnail:image withWidth:120 withHeight:120];
+        if(image) {
+            _thumbnail = [WFCCUtilities generateThumbnail:image withWidth:120 withHeight:120];
+        }
     }
-    if(!_thumbnail) {
-        _thumbnail = [WFCCIMService sharedWFCIMService].defaultThumbnailImage;
-    }
-    
+//    if(!_thumbnail) {
+//        _thumbnail = [WFCCIMService sharedWFCIMService].defaultThumbnailImage;
+//    }
     return _thumbnail;
 }
 
@@ -136,5 +151,9 @@
 
 - (NSString *)digest:(WFCCMessage *)message {
     return @"[图片]";
+}
+
+-(void)setImageSize:(CGSize)size {
+    self.size = size;
 }
 @end

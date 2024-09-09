@@ -29,6 +29,10 @@
         [dataDict setObject:self.groupId forKey:@"g"];
     }
     
+    if(self.ex) {
+        [dataDict setObject:self.ex forKey:@"ex"];
+    }
+    
     payload.binaryContent = [NSJSONSerialization dataWithJSONObject:dataDict
                                                             options:kNilOptions
                                                               error:nil];
@@ -46,6 +50,7 @@
         self.invitor = dictionary[@"o"];
         self.invitees = dictionary[@"ms"];
         self.groupId = dictionary[@"g"];
+        self.ex = dictionary[@"ex"];
     }
 }
 
