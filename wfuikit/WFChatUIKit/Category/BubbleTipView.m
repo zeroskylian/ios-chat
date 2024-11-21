@@ -86,8 +86,7 @@
     [super layoutSubviews];
     // return;
     CGRect newFrame = self.frame;
-    CGRect superviewFrame =
-    CGRectIsEmpty(_frameToPositionInRelationWith) ? self.superview.frame : _frameToPositionInRelationWith;
+//    CGRect superviewFrame = CGRectIsEmpty(_frameToPositionInRelationWith) ? self.superview.frame : _frameToPositionInRelationWith;
     
     CGFloat textWidth = [self sizeOfTextForCurrentSettings].width;
     
@@ -122,7 +121,7 @@
     if (@available(iOS 7.0, *)) {
         size = [self.bubbleTipText sizeWithAttributes:@{NSFontAttributeName : self.bubbleTipTextFont}];
     } else {
-        size = [self.bubbleTipText sizeWithFont:kDefaultbubbleTipTextFont];
+        size = [self.bubbleTipText sizeWithFont: kDefaultbubbleTipTextFont];
     }
     
     if (self.bubbleTipText.length == 1) {

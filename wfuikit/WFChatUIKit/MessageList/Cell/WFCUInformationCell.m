@@ -42,7 +42,7 @@
 - (void)setModel:(WFCUMessageModel *)model {
     [super setModel:model];
     
-    __weak typeof(self)ws = self;
+//    __weak typeof(self)ws = self;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserInfoUpdated:) name:kUserInfoUpdated object:nil];
 
@@ -57,7 +57,6 @@
     CGFloat width = self.contentView.bounds.size.width;
     
     CGSize size = [WFCUUtilities getTextDrawingSize:infoText font:[UIFont systemFontOfSize:14] constrainedSize:CGSizeMake(width - TEXT_LABEL_LEFT_PADDING - TEXT_LABEL_RIGHT_PADDING - TEXT_LEFT_PADDING - TEXT_RIGHT_PADDING, 8000)];
-    
     
     self.infoLabel.text = infoText;
     self.infoLabel.layoutMargins = UIEdgeInsetsMake(TEXT_TOP_PADDING, TEXT_LEFT_PADDING, TEXT_BUTTOM_PADDING, TEXT_RIGHT_PADDING);

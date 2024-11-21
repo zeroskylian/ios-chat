@@ -186,7 +186,7 @@ public:
                                  totalBytesSent:(int64_t)totalBytesSent
                        totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend {
     if(m_progressBlock) {
-        float uploadProgress = totalBytesSent * 1.f / self.fileSize;
+//        float uploadProgress = totalBytesSent * 1.f / self.fileSize;
         m_progressBlock((int)totalBytesSent, self.fileSize);
     }
 }

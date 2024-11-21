@@ -31,7 +31,7 @@
     
     content.localPath = path;
     content.size = image.size;
-    content.thumbnail = [WFCCUtilities generateThumbnail:image withWidth:120 withHeight:120];
+    content.thumbnail = [WFCCUtilities generateThumbnail:image withWidth:250 withHeight:250];
     
     return content;
 }

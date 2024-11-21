@@ -46,7 +46,7 @@
         self.edgesForExtendedLayout = UIRectEdgeNone;
     }
 
-    __weak typeof(self) ws = self;
+//    __weak typeof(self) ws = self;
     if (self.qrType == QRType_User) {
         self.qrStr = [NSString stringWithFormat:@"wildfirechat://user/%@", self.target];
 //        self.qrStr = [NSString stringWithFormat:@"wildfirechat://user/%@?from=%@", self.target, [WFCCNetworkService sharedInstance].userId];

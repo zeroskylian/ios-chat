@@ -1489,14 +1489,8 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/WildFireChat/framework",
-					"$(PROJECT_DIR)/framework",
-					"$(PROJECT_DIR)/Frameworks",
-					"$(PROJECT_DIR)/WildFireChat/AV/GoogleWebRTC/Frameworks/frameworks",
-					"$(PROJECT_DIR)/Frameworks/GoogleWebRTC/Frameworks/frameworks",
 					"$(PROJECT_DIR)/WildFireChat",
 					"$(PROJECT_DIR)/WildFireChat/Moments",
-					"$(PROJECT_DIR)/WildFireChat/SDWebImage",
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/WildFireChat/WFChat-Prefix-Header.pch";
 				INFOPLIST_FILE = WildFireChat/Info.plist;
@@ -1534,14 +1528,8 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/WildFireChat/framework",
-					"$(PROJECT_DIR)/framework",
-					"$(PROJECT_DIR)/Frameworks",
-					"$(PROJECT_DIR)/WildFireChat/AV/GoogleWebRTC/Frameworks/frameworks",
-					"$(PROJECT_DIR)/Frameworks/GoogleWebRTC/Frameworks/frameworks",
 					"$(PROJECT_DIR)/WildFireChat",
 					"$(PROJECT_DIR)/WildFireChat/Moments",
-					"$(PROJECT_DIR)/WildFireChat/SDWebImage",
 				);
 				GCC_PREFIX_HEADER = "$(SRCROOT)/WildFireChat/WFChat-Prefix-Header.pch";
 				INFOPLIST_FILE = WildFireChat/Info.plist;
@@ -1576,10 +1564,7 @@
 				CURRENT_PROJECT_VERSION = 108;
 				DEVELOPMENT_TEAM = R9H33JX4W4;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/WildFireChat/SDWebImage",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1609,10 +1594,7 @@
 				CURRENT_PROJECT_VERSION = 108;
 				DEVELOPMENT_TEAM = R9H33JX4W4;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/WildFireChat/SDWebImage",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (

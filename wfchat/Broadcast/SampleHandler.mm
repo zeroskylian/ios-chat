@@ -113,7 +113,7 @@
             AudioBufferList audioBufferList;
             NSMutableData *data=[[NSMutableData alloc] init];
             CMBlockBufferRef blockBuffer;
-            OSStatus status = CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(ref, NULL, &audioBufferList, sizeof(audioBufferList), NULL, NULL, 0, &blockBuffer);
+//            OSStatus status = CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(ref, NULL, &audioBufferList, sizeof(audioBufferList), NULL, NULL, 0, &blockBuffer);
 
             for(int y=0; y < audioBufferList.mNumberBuffers; y++) {
                 AudioBuffer audioBuffer = audioBufferList.mBuffers[y];

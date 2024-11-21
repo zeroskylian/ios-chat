@@ -28,7 +28,7 @@
     
     CGRect bounds = self.view.bounds;
     CGFloat buttonHeight = 48;
-    CGFloat buttonWidth = bounds.size.width - 16 - 16;
+//    CGFloat buttonWidth = bounds.size.width - 16 - 16;
     
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, bounds.size.height - [WFCUUtilities wf_safeDistanceBottom] - buttonHeight - 16)];
     self.tableView.delegate = self;
@@ -114,7 +114,7 @@
 
 #pragma mark - UITableViewDelegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *userId = [WFCUConferenceManager sharedInstance].handupMembers[indexPath.row];
+//    NSString *userId = [WFCUConferenceManager sharedInstance].handupMembers[indexPath.row];
 }
 #endif
 @end
