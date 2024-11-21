@@ -56,6 +56,14 @@
     return content;
 }
 
++ (instancetype)contentFromLocalPath:(NSString *)localPath size: (CGSize)size thumbnail: (UIImage *)thumbnail {
+    WFCCImageMessageContent *content = [[WFCCImageMessageContent alloc] init];
+    content.localPath = localPath;
+    content.size = size;
+    content.thumbnail = thumbnail;
+    return  content;
+}
+
 - (WFCCMessagePayload *)encode {
     WFCCMediaMessagePayload *payload = (WFCCMediaMessagePayload *)[super encode];
     payload.searchableContent = @"[图片]";

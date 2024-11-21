@@ -64,4 +64,11 @@
 ///   - image: 图片
 ///   - path: 图片缓存路径
 + (instancetype)jpegImageContent:(UIImage *)image cachePath:(NSString *)path;
+
+/// 生成图片消息体
+/// - Parameters:
+///   - localPath: 本地路径
+///   - size: 图片大小
+///   - thumbnail: 缩略图
++ (instancetype)contentFromLocalPath:(NSString *)localPath size: (CGSize)size thumbnail: (UIImage *)thumbnail;
 @end
