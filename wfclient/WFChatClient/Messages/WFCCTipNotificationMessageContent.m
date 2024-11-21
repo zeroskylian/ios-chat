@@ -29,7 +29,7 @@
 }
 
 + (int)getContentFlags {
-    return WFCCPersistFlag_PERSIST;
+    return WFCCPersistFlag_TRANSPARENT;
 }
 
 
