@@ -52,4 +52,14 @@
 撤回消息的时间戳
 */
 @property (nonatomic, assign)long long originalMessageTimestamp;
+
+/**
+ 提醒类型，1，提醒部分对象（mentinedTarget）。2，提醒全部。其他不提醒
+ */
+@property (nonatomic, assign)int mentionedType;
+
+/**
+ 提醒对象，mentionedType 1时有效
+ */
+@property (nonatomic, strong)NSArray<NSString *> *mentionedTargets;
 @end
