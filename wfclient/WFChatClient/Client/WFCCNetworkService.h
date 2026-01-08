@@ -473,7 +473,7 @@ typedef NS_ENUM(NSInteger, ConnectedNetworkType) {
 
  @param filter 消息拦截Filter
  */
-- (void)addReceiveMessageFilter:(id<ReceiveMessageFilter>)filter;
+- (void)addReceiveMessageFilter:(id<ReceiveMessageFilter>)filter NS_SWIFT_NAME(addReceiveMessageFilter(_:));
 
 /**
  移除消息拦截Filter

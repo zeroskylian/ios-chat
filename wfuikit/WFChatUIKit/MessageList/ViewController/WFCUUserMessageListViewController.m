@@ -91,7 +91,7 @@
     CGFloat maximumOffset = size.height;
     
     CGFloat minSpace = 5;
-    CGFloat maxSpace = 10;
+//    CGFloat maxSpace = 10;
     bool isNeedLoadMore = false;
     //上拉加载更多
     //tableview 的 content的高度 小于 tableview的高度

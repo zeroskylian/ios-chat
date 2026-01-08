@@ -720,7 +720,7 @@ static WFCUConferenceManager *sharedSingleton = nil;
     for (UIView *view in self.broadPickerView.subviews) {
         if ([view isKindOfClass:[UIButton class]]) {
             float iOSVersion = [[UIDevice currentDevice].systemVersion floatValue];
-            UIButton *button = (UIButton *)view;
+//            UIButton *button = (UIButton *)view;
             if (iOSVersion >= 13) {
                 [(UIButton *)view sendActionsForControlEvents:UIControlEventTouchDown];
                 [(UIButton *)view sendActionsForControlEvents:UIControlEventTouchUpInside];

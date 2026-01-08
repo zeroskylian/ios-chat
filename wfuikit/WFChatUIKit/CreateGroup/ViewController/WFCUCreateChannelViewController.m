@@ -176,14 +176,12 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
         dispatch_async(dispatch_get_main_queue(), ^{
             [hud hideAnimated:NO];
             ws.portraitUrl = remoteUrl;
-            NSString *name = ws.nameField.text;
+//            NSString *name = ws.nameField.text;
             [ws createChannel:ws.portraitUrl];
         });
-    }
-                                           progress:^(long uploaded, long total) {
-                                               
-                                           }
-                                              error:^(int error_code) {
+    } progress:^(long uploaded, long total) {
+        
+    } error:^(int error_code) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [hud hideAnimated:NO];
             hud = [MBProgressHUD showHUDAddedTo:ws.view animated:YES];

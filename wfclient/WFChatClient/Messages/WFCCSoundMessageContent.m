@@ -45,7 +45,7 @@
 
 - (WFCCMessagePayload *)encode {
     WFCCMediaMessagePayload *payload = (WFCCMediaMessagePayload *)[super encode];
-    payload.searchableContent = @"[声音]";
+    payload.searchableContent = @"[语音]";
     payload.mediaType = Media_Type_VOICE;
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
     [dict setObject:@(_duration) forKey:@"duration"];
@@ -86,6 +86,6 @@
 }
 
 - (NSString *)digest:(WFCCMessage *)message {
-    return @"[声音]";
+    return @"[语音]";
 }
 @end

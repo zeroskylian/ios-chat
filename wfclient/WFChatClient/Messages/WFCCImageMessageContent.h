@@ -50,4 +50,25 @@
  */
 @property (nonatomic, strong)NSString *thumbParameter;
 
+-(void)setImageSize:(CGSize)size;
+
+
+/// 发送png原图
+/// - Parameters:
+///   - image: 原图
+///   - path: 图片缓存路径
++ (instancetype)pngImageContent:(UIImage *)image cachePath:(NSString *)path;
+
+/// 发送 jpeg 原图
+/// - Parameters:
+///   - image: 图片
+///   - path: 图片缓存路径
++ (instancetype)jpegImageContent:(UIImage *)image cachePath:(NSString *)path;
+
+/// 生成图片消息体
+/// - Parameters:
+///   - localPath: 本地路径
+///   - size: 图片大小
+///   - thumbnail: 缩略图
++ (instancetype)contentFromLocalPath:(NSString *)localPath size: (CGSize)size thumbnail: (UIImage *)thumbnail;
 @end

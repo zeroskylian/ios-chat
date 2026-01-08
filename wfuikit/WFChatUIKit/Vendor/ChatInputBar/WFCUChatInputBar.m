@@ -1783,7 +1783,7 @@
         thumbnail = [WFCCUtilities generateThumbnail:thumbnail withWidth:120 withHeight:120];
         
         AVURLAsset *avAsset = [AVURLAsset URLAssetWithURL:videoURL options:nil];
-        NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+//        NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
         
         NSString *CompressionVideoPaht = [WFCCUtilities getDocumentPathWithComponent:@"/VIDEO"];
         AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:@"AVAssetExportPresetMediumQuality"];
@@ -1973,7 +1973,7 @@
     thumbnail = [WFCCUtilities generateThumbnail:thumbnail withWidth:120 withHeight:120];
 
     AVURLAsset *avAsset = [AVURLAsset URLAssetWithURL:url options:nil];
-    NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+//    NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
 
     NSString *CompressionVideoPaht = [WFCCUtilities getDocumentPathWithComponent:@"/VIDEO"];
     AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:@"AVAssetExportPresetMediumQuality"];

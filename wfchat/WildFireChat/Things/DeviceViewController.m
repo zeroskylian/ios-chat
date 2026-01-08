@@ -129,7 +129,7 @@
                         }
                     }
                 } else if ([msg.content isKindOfClass:[WFCCThingsLostEventContent class]]) {
-                    WFCCThingsLostEventContent *thingsLostEvent = (WFCCThingsLostEventContent *)msg.content;
+//                    WFCCThingsLostEventContent *thingsLostEvent = (WFCCThingsLostEventContent *)msg.content;
                 }
             }
         }

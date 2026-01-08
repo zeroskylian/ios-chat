@@ -146,7 +146,7 @@
 
     CGFloat xOffset = location.x;
     CGFloat yOffset = location.y;
-    NSRange glyphRange;
+//    NSRange glyphRange;
     CGFloat partialFraction;
     NSUInteger charIndex = [layoutManager characterIndexForPoint:CGPointMake(xOffset, yOffset) inTextContainer:textContainer fractionOfDistanceBetweenInsertionPoints:&partialFraction];
     
