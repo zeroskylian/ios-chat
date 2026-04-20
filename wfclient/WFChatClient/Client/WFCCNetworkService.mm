@@ -649,6 +649,7 @@ class CSACB : public mars::stn::CustomSortAddressCallback {
 
 @property (nonatomic, assign)BOOL connectedToMainNetwork;
 @property (nonatomic, assign)int doubleNetworkStrategy;
+@property (nonatomic, assign)BOOL forceConnecting;
 
 /**
  流式文本生成状态监听
@@ -1125,6 +1126,10 @@ static WFCCNetworkService * sharedSingleton = nil;
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+            if (self.forceConnecting) {
+                self.forceConnecting = false;
+                return;
+            }
           [self onAppSuspend];
         }
       });
@@ -1207,6 +1212,7 @@ static WFCCNetworkService * sharedSingleton = nil;
                                                        selector:@selector(forceConnectTimeOut)
                                                        userInfo:nil
                                                         repeats:NO];
+            ws.forceConnecting = true;
         }
     }
   });

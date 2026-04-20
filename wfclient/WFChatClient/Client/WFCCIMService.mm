@@ -193,7 +193,7 @@ public:
                                  totalBytesSent:(int64_t)totalBytesSent
                        totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend {
     if(m_progressBlock) {
-        float uploadProgress = totalBytesSent * 1.f / self.fileSize;
+//        float uploadProgress = totalBytesSent * 1.f / self.fileSize;
         m_progressBlock((int)totalBytesSent, self.fileSize);
     }
 }
@@ -2163,7 +2163,7 @@ static void fillTMessage(mars::stn::TMessage &tmsg, WFCCConversation *conv, WFCC
 
 - (void)clearMessageUnreadStatusBefore:(long)messageId conversation:(WFCCConversation *)conversation {
     if(messageId) {
-        mars::stn::MessageDB::Instance()->ClearUnreadStatusBeforeMessage((int)messageId, conversation.type, conversation.target?[conversation.target UTF8String]:"", conversation.line);
+        mars::stn::MessageDB::Instance()->ClearUnreadStatusBeforeMessage((int)messageId, (int)conversation.type, conversation.target?[conversation.target UTF8String]:"", conversation.line);
     }
 }
 

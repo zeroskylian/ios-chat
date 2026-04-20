@@ -14,20 +14,29 @@
 @implementation WFCCLinkMessageContent
 - (WFCCMessagePayload *)encode {
     WFCCMessagePayload *payload = [super encode];
-    payload.searchableContent = self.title;
     
     NSMutableDictionary *dataDict = [NSMutableDictionary dictionary];
+    NSMutableString *searchableContent = [NSMutableString string];
+    
+    if (self.title) {
+        dataDict[@"tt"] = self.title;
+        [searchableContent appendString:self.title];
+    }
+    
     if (self.contentDigest) {
-        [dataDict setObject:self.contentDigest forKey:@"d"];
+        dataDict[@"d"] = self.contentDigest;
+        [searchableContent appendString:self.contentDigest];
     }
     if (self.url) {
-        [dataDict setObject:self.url forKey:@"u"];
+        dataDict[@"u"] = self.url;
+        [searchableContent appendString:self.url];
     }
     
     if (self.thumbnailUrl) {
         [dataDict setObject:self.thumbnailUrl forKey:@"t"];
     }
     
+    payload.searchableContent = searchableContent;
     payload.binaryContent = [NSJSONSerialization dataWithJSONObject:dataDict
                                                                            options:kNilOptions
                                                                              error:nil];
@@ -37,14 +46,18 @@
 
 - (void)decode:(WFCCMessagePayload *)payload {
     [super decode:payload];
-    self.title = payload.searchableContent;
-    
     NSError *__error = nil;
     WFCCDictionary *dictionary = [WFCCDictionary fromData:payload.binaryContent error:&__error];
     if (!__error) {
         self.contentDigest = dictionary[@"d"];
         self.url = dictionary[@"u"];
         self.thumbnailUrl = dictionary[@"t"];
+        NSString *title = dictionary[@"tt"];
+        if (title) {
+            self.title = title;
+        } else {
+            self.title = payload.searchableContent;
+        }
     }
 }
 

@@ -212,9 +212,9 @@
     cell.textLabel.text = self.dataSource[indexPath.section][@"title"];
     cell.imageView.image = [UIImage imageNamed:self.dataSource[indexPath.section][@"image"]];
     if (indexPath.section == 0 && self.hasMoments) {
+#ifdef WFC_MOMENTS
             DiscoverMomentsTableViewCell *momentsCell = (DiscoverMomentsTableViewCell *)cell;
             __weak typeof(self)ws = self;
-#ifdef WFC_MOMENTS
             int unread = [[WFMomentService sharedService] getUnreadCount];
             if (unread) {
                 momentsCell.bubbleView.hidden = NO;

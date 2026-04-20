@@ -6,7 +6,7 @@
   Copyright © 2019 WildFireChat. All rights reserved.
 */
 CFBundleName="Wildfire IM";
-CFBundleDisplayName="Wildfire IM";
+CFBundleDisplayName="Wildfire IM Demo";
 Message="Message";
 Contact="Contact";
 Work="Work";
