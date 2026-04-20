@@ -293,9 +293,9 @@ static OrgService *sharedSingleton = nil;
     [self post:@"/api/employee/search" data:@{@"keyword":keyword, @"organizationId":@(organizationId), @"count":@(50), @"page":@(0)} isLogin:NO success:^(NSDictionary *dict) {
         if([dict[@"code"] intValue] == 0) {
             NSDictionary *exDict = dict[@"result"];
-            int totalPages = [exDict[@"totalPages"] intValue];
-            int totalCount = [exDict[@"totalCount"] intValue];
-            int currentPage = [exDict[@"currentPage"] intValue];
+//            int totalPages = [exDict[@"totalPages"] intValue];
+//            int totalCount = [exDict[@"totalCount"] intValue];
+//            int currentPage = [exDict[@"currentPage"] intValue];
             NSArray<NSDictionary *> *arr = exDict[@"contents"];
             NSMutableArray *result = [[NSMutableArray alloc] init];
             [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {

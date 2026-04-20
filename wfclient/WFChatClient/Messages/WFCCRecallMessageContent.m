@@ -26,6 +26,8 @@
     //注意：在proto层收到撤回命令或主动撤回成功会直接更新被撤回的消息，如果修改encode&decode，需要同步修改
     self.operatorId = payload.content;
     self.messageUid = [[[NSString alloc] initWithData:payload.binaryContent encoding:NSUTF8StringEncoding] longLongValue];
+    self.mentionedType = payload.mentionedType;
+    self.mentionedTargets = payload.mentionedTargets;
     if (self.extra.length) {
         NSError *__error = nil;
         WFCCDictionary *dictionary = [WFCCDictionary fromString:payload.extra error:&__error];

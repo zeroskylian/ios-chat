@@ -48,7 +48,7 @@
 }
 
 + (int)getContentFlags {
-    return WFCCPersistFlag_PERSIST;
+    return WFCCPersistFlag_NOT_PERSIST;
 }
 
 
